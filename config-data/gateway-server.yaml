@@ -28,7 +28,7 @@ spring:
         - id: repair-service
           uri: lb://repair-service
           predicates:
-            - Path=/api/v1/repair/**
+            - Path=/api/v1/repair/**, /api/v1/operation/**
         - id: repair-list-service
           uri: lb://repair-list-service
           predicates:
