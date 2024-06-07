@@ -1,0 +1,15 @@
+server:
+  port: 8092
+spring:
+  datasource:
+    url: jbdc:postgresql://localhost:5432/lab2tingesorepair
+    username: fej
+    password: 123
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      default-zone: http://localhost:8761/eureka
+  instance:
+    hostname: localhost
