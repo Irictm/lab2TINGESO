@@ -2,7 +2,7 @@ server:
   port: 8092
 spring:
   datasource:
-    url: jbdc:postgresql://localhost:5432/lab2tingesorepair
+    url: jdbc:postgresql://localhost:5432/lab2tingesorepair
     username: fej
     password: 123
 eureka:
