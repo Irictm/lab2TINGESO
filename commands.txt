@@ -68,3 +68,7 @@ kubectl apply -f vehicle-deployment-service.yaml
 
 kubectl apply -f report-db-deployment-service.yaml
 kubectl apply -f report-deployment-service.yaml
+
+
+- Check postgres image dbs-
+kubectl exec -it {PODNAME} -- psql -U fej -c "\l"

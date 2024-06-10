@@ -54,6 +54,11 @@ spec:
           ports:
             - containerPort: 5432
           env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config-map
+                  key: DB_DBNAME_VEHICLE
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:

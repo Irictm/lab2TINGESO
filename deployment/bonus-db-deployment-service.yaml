@@ -64,6 +64,11 @@ spec:
                 secretKeyRef:
                   name: postgres-credentials
                   key: DB_PASSWORD_BONUS
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config-map
+                  key: DB_DBNAME_BONUS
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: bonus-db-data
