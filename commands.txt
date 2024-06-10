@@ -1,0 +1,70 @@
+- Docker Build and Push -
+docker build -t irictm/lab2-tingeso-config-server:latest .
+docker push irictm/lab2-tingeso-config-server:latest
+
+docker build -t irictm/lab2-tingeso-eureka-server:latest .
+docker push irictm/lab2-tingeso-eureka-server:latest
+
+docker build -t irictm/lab2-tingeso-gateway-server:latest .
+docker push irictm/lab2-tingeso-gateway-server:latest
+
+docker build -t irictm/lab2-tingeso-bonus-service:latest .
+docker push irictm/lab2-tingeso-bonus-service:latest
+
+docker build -t irictm/lab2-tingeso-repair-list-service:latest .
+docker push irictm/lab2-tingeso-repair-list-service:latest
+
+docker build -t irictm/lab2-tingeso-repair-service:latest .
+docker push irictm/lab2-tingeso-repair-service:latest
+
+docker build -t irictm/lab2-tingeso-vehicle-service:latest .
+docker push irictm/lab2-tingeso-vehicle-service:latest
+
+docker build -t irictm/lab2-tingeso-report-service:latest .
+docker push irictm/lab2-tingeso-report-service:latest
+
+- Kubernetes Delete Current Stuff -
+kubectl delete deployments --all
+kubectl delete deployments {name}
+
+kubectl delete services --all
+kubectl delete services {name}
+
+kubectl delete configmap --all
+kubectl delete configmap {name}
+
+kubectl delete secrets --all
+kubectl delete secrets {name}
+
+kubectl delete pv --all
+kubectl delete pv {name}
+
+kubectl delete pvc --all
+kubectl delete pvc {name}
+
+- Kubernetes Deployment -
+kubectl apply -f postgres-config-map.yaml
+kubectl apply -f postgres-secrets.yaml
+
+kubectl apply -f config-server-deployment-service.yaml
+kubectl apply -f eureka-server-deployment-service.yaml
+kubectl apply -f gateway-server-deployment-service.yaml
+
+kubectl apply -f bonus-db-deployment-service.yaml
+kubectl apply -f repair-db-deployment-service.yaml
+kubectl apply -f repair-list-db-deployment-service.yaml
+kubectl apply -f vehicle-db-deployment-service.yaml
+
+kubectl apply -f bonus-deployment-service.yaml
+kubectl apply -f repair-deployment-service.yaml
+kubectl apply -f repair-list-deployment-service.yaml
+kubectl apply -f vehicle-deployment-service.yaml
+
+
+
+
+
+
+
+kubectl apply -f report-db-deployment-service.yaml
+kubectl apply -f report-deployment-service.yaml

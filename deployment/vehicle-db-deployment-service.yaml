@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vehicle-db-pv
+  labels:
+    type: local
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/vehicle-db-data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vehicle-db-pvc
+  labels:
+    app: postgres
+    tier: database
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicle-db-deployment
+  labels:
+    app: vehicle-db-deployment
+    tier: database
+spec:
+  selector:
+    matchLabels:
+      app: vehicle-db-deployment
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: vehicle-db-deployment
+        tier: database
+    spec:
+      containers:
+        - name: vehicle-db
+          image: postgres
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DB_USER_VEHICLE
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DB_PASSWORD_VEHICLE
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: vehicle-db-data
+      volumes:
+        - name: vehicle-db-data
+          persistentVolumeClaim:
+            claimName: vehicle-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vehicle-db-service
+  labels:
+    app: vehicle-db-service
+    tier: database
+spec:
+  ports:
+    - port: 5433
+      targetPort: 5432
+      protocol: TCP
+  selector:
+    app: vehicle-db-deployment
+    tier: database
+  type: LoadBalancer

@@ -1,15 +1,15 @@
 server:
-  port: 8093
+  port: ${SERVER_PORT}
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/lab2tingesorepairlist
-    username: fej
-    password: 123
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DBNAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
 eureka:
+  instance:
+    preferIpAddress: true
   client:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      default-zone: http://localhost:8761/eureka
-  instance:
-    hostname: localhost
+      defaultZone: http://eureka-server-service:8761/eureka/
