@@ -71,4 +71,9 @@ kubectl apply -f report-deployment-service.yaml
 
 
 - Check postgres image dbs-
-kubectl exec -it {PODNAME} -- psql -U fej -c "\l"
+kubectl exec -it {PODNAME} -- psql -U fej -d {DBNAME} -c "\l"
+kubectl exec -it {PODNAME} /bin/bash
+
+TL;DR: psql -d <database_name>
+
+172.23.6.66:32496/
