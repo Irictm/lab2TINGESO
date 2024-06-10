@@ -76,4 +76,4 @@ kubectl exec -it {PODNAME} /bin/bash
 
 TL;DR: psql -d <database_name>
 
-172.23.6.66:32496/
+172.23.6.66:31004/

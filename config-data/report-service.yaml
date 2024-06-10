@@ -1,8 +1,8 @@
 server:
-  port: 8091
+  port: 8094
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/lab2tingesovehicle
+    url: jdbc:postgresql://localhost:5432/lab2tingesoreport
     username: fej
     password: 123
 eureka:
