@@ -21,6 +21,10 @@ public class RepairEntity {
     private Long id;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dateOfAdmission;
+    private Long operationsAmount;
+    private Long rechargeAmount;
+    private Long discountAmount;
+    private Long ivaAmount;
     private Long totalAmount;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dateOfRelease;

@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface RepairListRepository extends JpaRepository<RepairListEntity, Long> {
 
-    @Query(value = "SELECT * FROM repair_list WHERE type = :type AND motorType = :motor", nativeQuery = true)
+    @Query(value = "SELECT * FROM repair_list WHERE operationType = :type AND motorType = :motor", nativeQuery = true)
     public Long getBaseCost(@Param("type") int type, @Param("motor") String motor);
 
 }

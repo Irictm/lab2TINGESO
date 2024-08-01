@@ -14,4 +14,10 @@ public interface VehicleRepository extends JpaRepository<VehicleEntity, Long> {
     @Query(value = "SELECT * FROM vehicles WHERE brand = :brand", nativeQuery = true)
     public List<VehicleEntity> findAllByBrand(@Param("brand") String brand);
 
+    @Query(value = "SELECT * FROM vehicles WHERE type = :type", nativeQuery = true)
+    public List<VehicleEntity> findAllByType(@Param("type") String brand);
+
+    @Query(value = "SELECT DISTINCT type FROM vehicles", nativeQuery = true)
+    public List<String> findAllVehicleTypes();
+
 }

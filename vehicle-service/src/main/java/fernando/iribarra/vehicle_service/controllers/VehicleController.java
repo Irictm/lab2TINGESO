@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/vehicle")
-@CrossOrigin("*")
 public class VehicleController {
     @Autowired
     VehicleService vehicleService;
@@ -27,9 +26,21 @@ public class VehicleController {
         return ResponseEntity.ok(vehicles);
     }
 
+    @GetMapping("/vehicletypes")
+    public ResponseEntity<List<String>> getAllVehicleTypes() {
+        List<String> vehicleTypes = vehicleService.getAllVehicleTypes();
+        return ResponseEntity.ok(vehicleTypes);
+    }
+
     @GetMapping("/brand/{brand}")
     public ResponseEntity<List<VehicleEntity>> getAllVehiclesWithBrand(@PathVariable String brand) {
         List<VehicleEntity> vehicles = vehicleService.getVehiclesByBrand(brand);
+        return ResponseEntity.ok(vehicles);
+    }
+
+    @GetMapping("/type/{type}")
+    public ResponseEntity<List<VehicleEntity>> getAllVehiclesWithType(@PathVariable String type) {
+        List<VehicleEntity> vehicles = vehicleService.getVehiclesByType(type);
         return ResponseEntity.ok(vehicles);
     }
 

@@ -44,7 +44,10 @@ public class OperationService {
                 List.of(220_000L,230_000L,800_000L,300_000L,
                         250_000L,0L,100_000L,250_000L,
                         180_000L,0L,80_000L));
-        return baseRepairCosts.get(typeOfMotor).get(operation.getType()-1);
+        long opCost = baseRepairCosts.get(typeOfMotor).get(operation.getType()-1);
+        operation.setAmount(opCost);
+        operationRepository.save(operation);
+        return opCost;
         //restTemplate.getForObject("http://repair-list-service/api/v1/repairList/" + operation.getType() + "/" + typeOfMotor, Long.class);
     }
 

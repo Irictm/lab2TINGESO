@@ -4,6 +4,9 @@ import fernando.iribarra.vehicle_service.entities.VehicleEntity;
 import fernando.iribarra.vehicle_service.repositories.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,10 +29,10 @@ public class VehicleService {
         VehicleEntity vehicle = getVehicleById(id);
         List<Long> values = new ArrayList<>();
         HttpEntity<VehicleEntity> body = new HttpEntity<VehicleEntity>(vehicle);
-        values.add(restTemplate.getForObject("http://repair-service/api/v1/repair/repNumbDisc/100", Long.class, body));
-        values.add(restTemplate.getForObject("http://repair-service/api/v1/repair/bonusDisc/false", Long.class, body));
-        values.add(restTemplate.getForObject("http://repair-service/api/v1/repair/antiquityRech/100", Long.class, body));
-        values.add(restTemplate.getForObject("http://repair-service/api/v1/repair/mileageRech/100", Long.class, body));
+        values.add(restTemplate.postForObject("http://repair-service/api/v1/repair/repNumbDisc/100", body, Long.class));
+        values.add(restTemplate.postForObject("http://repair-service/api/v1/repair/bonusDisc/false", body, Long.class));
+        values.add(restTemplate.postForObject("http://repair-service/api/v1/repair/antiquityRech/100", body, Long.class));
+        values.add(restTemplate.postForObject("http://repair-service/api/v1/repair/mileageRech/100", body, Long.class));
         //values.add(repairService.repairNumberDiscount(vehicle, 100));
         //values.add(repairService.bonusDiscount(vehicle,false));
         //values.add(repairService.antiquityRecharge(vehicle, 100));
@@ -39,7 +42,29 @@ public class VehicleService {
 
     public List<VehicleEntity> getAllVehicles() { return vehicleRepository.findAll(); }
 
+    public List<String> getAllVehicleTypes() {
+        List<String> types = vehicleRepository.findAllVehicleTypes();
+        if (!types.contains("Sedan")) {
+            types.add("Sedan");
+        }
+        if (!types.contains("Hatchback")) {
+            types.add("Hatchback");
+        }
+        if (!types.contains("SUV")) {
+            types.add("SUV");
+        }
+        if (!types.contains("Pickup")) {
+            types.add("Pickup");
+        }
+        if (!types.contains("Furgoneta")) {
+            types.add("Furgoneta");
+        }
+        return types;
+    }
+
     public List<VehicleEntity> getVehiclesByBrand(String brand) { return vehicleRepository.findAllByBrand(brand); }
+
+    public List<VehicleEntity> getVehiclesByType(String type) { return vehicleRepository.findAllByType(type); }
 
     public VehicleEntity updateVehicle(VehicleEntity vehicle) {return vehicleRepository.save(vehicle);}
 

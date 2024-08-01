@@ -5,13 +5,17 @@ import fernando.iribarra.repair_service.entities.RepairEntity;
 import fernando.iribarra.repair_service.models.VehicleEntity;
 import fernando.iribarra.repair_service.repositories.RepairRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.swing.text.DateFormatter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +43,52 @@ public class RepairService {
     public RepairEntity getRepairById(Long id) { return repairRepository.findById(id).get();}
 
     public List<RepairEntity> getAllRepairs() { return repairRepository.findAll(); }
+
+    public List<Long> getRepairCountAndValue(String vehicleType, Long opType) {
+        ParameterizedTypeReference<List<VehicleEntity>> responseType = new ParameterizedTypeReference<List<VehicleEntity>>() {};
+        List<VehicleEntity> vehicles = restTemplate.exchange("http://vehicle-service/api/v1/vehicle/type/" + vehicleType, HttpMethod.GET, null, responseType).getBody();
+        OperationEntity opTemp = new OperationEntity(1L, "", opType.intValue(), LocalDateTime.now(), 1L, 1L);
+        List<Long> values = new ArrayList<>();
+        List<RepairEntity> repairs = new ArrayList<>();
+        Long cost = 0L;
+        for(VehicleEntity vehicle: vehicles){
+            List<RepairEntity> foundRepairs =  repairRepository.findVehicleRepairsWithOpType(vehicle.getId(), opType);
+            if(foundRepairs != null) {
+                cost += operationService.calculateBaseCost(opTemp, vehicle.getMotorType());
+                repairs.addAll(foundRepairs);
+            }
+        }
+        values.add((long) repairs.size());
+        values.add(cost);
+        return values;
+    }
+
+    public Map<String, String> getRepairAndVehicleData(Long id) {
+        RepairEntity repair = repairRepository.findById(id).get();
+        VehicleEntity vehicle = restTemplate.getForObject("http://vehicle-service/api/v1/vehicle/" + repair.getId_vehicle(), VehicleEntity.class);
+        Map<String, String> values = new HashMap<>();
+        if (vehicle == null) { return values;}
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        values.put("patent", vehicle.getPatentNumber());
+        values.put("brand", vehicle.getBrand());
+        values.put("model", vehicle.getModel());
+        values.put("vehicleType", vehicle.getType());
+        values.put("fabricationDate", vehicle.getFabricationDate().format(dateFormatter));
+        values.put("motor", vehicle.getMotorType());
+        values.put("dateOfAdmission", repair.getDateOfAdmission().format(dateTimeFormatter));
+        values.put("operationsAmount", String.valueOf(repair.getOperationsAmount()));
+        values.put("rechargeAmount", String.valueOf(repair.getRechargeAmount()));
+        values.put("discountAmount", String.valueOf(repair.getDiscountAmount()));
+        values.put("subTotal", String.valueOf(repair.getOperationsAmount() + repair.getRechargeAmount() - repair.getDiscountAmount()));
+        values.put("ivaAmount", String.valueOf(repair.getIvaAmount()));
+        values.put("totalAmount", String.valueOf(repair.getTotalAmount()));
+        values.put("dateOfRelease", repair.getDateOfRelease().format(dateTimeFormatter));
+        values.put("dateOfPickUp", repair.getDateOfPickUp().format(dateTimeFormatter));
+
+        return values;
+    }
 
     public List<Long> getAllRepairsWithOperationType(int typeOp) {
         OperationEntity opTemp = new OperationEntity(1L, "", typeOp, LocalDateTime.now(), 1L, 1L);
@@ -71,22 +121,25 @@ public class RepairService {
         VehicleEntity vehicle = restTemplate.getForObject("http://vehicle-service/api/v1/vehicle/" + repair.getId_vehicle(), VehicleEntity.class);
         //VehicleEntity vehicle = vehicleService.getVehicleById(repair.getId_vehicle());
         if (vehicle == null) {
-            System.out.print("ERROR, Vehiculo asociado a reparacion no existe.");
+            System.out.print("ERROR, Vehiculo asociado a reparacion no existe. \n");
             return repair;
         }
 
         long baseCost = operationService.calculateTotalRepairBaseCost(repair.getId(), vehicle.getMotorType());
+        long rechargeCost = mileageRecharge(vehicle, baseCost) + antiquityRecharge(vehicle, baseCost) + delayRecharge(repair, baseCost);
+        long discountsCost = repairNumberDiscount(vehicle, baseCost) + attentionDayDiscount(repair, baseCost) + bonusDiscount(vehicle, !(repair.getTotalAmount() > 0L));
+        repair.setOperationsAmount(baseCost);
+        repair.setRechargeAmount(rechargeCost);
+        repair.setDiscountAmount(discountsCost);
 
         totalCost += baseCost;
-        totalCost += mileageRecharge(vehicle, baseCost) + antiquityRecharge(vehicle, baseCost) + delayRecharge(repair, baseCost);
-        totalCost -= repairNumberDiscount(vehicle, baseCost) + attentionDayDiscount(repair, baseCost);
-        if (repair.getTotalAmount() > 0L) {
-            totalCost -= bonusDiscount(vehicle, false);
-        }
-        else {
-            totalCost -= bonusDiscount(vehicle, true);
-        }
-        totalCost += Math.round(totalCost * IVA);
+        totalCost += rechargeCost;
+        totalCost -= discountsCost;
+
+        long ivaCost = Math.round(totalCost * IVA);
+        repair.setIvaAmount(ivaCost);
+
+        totalCost += ivaCost;
 
         if (totalCost < 0L){ totalCost = 0L;}
 
@@ -228,7 +281,8 @@ public class RepairService {
     public Long getAvgRepairTimeOfBrand(String brand) {
         Long average = 0L;
         Long i = 0L;
-        List<VehicleEntity> vehicles = restTemplate.getForObject("http://vehicle-service/api/v1/vehicle/brand/" + brand, List.class);
+        ParameterizedTypeReference<List<VehicleEntity>> responseType = new ParameterizedTypeReference<List<VehicleEntity>>() {};
+        List<VehicleEntity> vehicles = restTemplate.exchange("http://vehicle-service/api/v1/vehicle/brand/" + brand, HttpMethod.GET, null, responseType).getBody();
         List<RepairEntity> repairs = new ArrayList<>();
         for (VehicleEntity vehicle: vehicles) {
             repairs.addAll(repairRepository.findAllByVehicleId(vehicle.getId()));

@@ -1,4 +1,4 @@
-package fernando.iribarra.repair_service.models;
+package fernando.iribarra.report_service.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

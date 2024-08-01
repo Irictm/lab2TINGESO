@@ -8,10 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/repair")
-@CrossOrigin("*")
 public class RepairController {
     @Autowired
     RepairService repairService;
@@ -34,31 +34,43 @@ public class RepairController {
         return ResponseEntity.ok(repairs);
     }
 
+    @GetMapping("/repairAndVehicleData/{id}")
+    public ResponseEntity<Map<String, String>> getRepairAndVehicleData(@PathVariable Long id) {
+        Map<String, String> values = repairService.getRepairAndVehicleData(id);
+        return ResponseEntity.ok(values);
+    }
+
     @GetMapping("/operationtype/{typeOp}")
     public ResponseEntity<List<Long>> getAllRepairsWithOpType(@PathVariable int typeOp) {
         List<Long> values = repairService.getAllRepairsWithOperationType(typeOp);
         return ResponseEntity.ok(values);
     }
 
-    @GetMapping("/repNumbDisc/{baseCost}")
+    @GetMapping("/repairCountAndValue/{vehicleType}/{typeOp}")
+    public ResponseEntity<List<Long>> getRepairCountAndValue(@PathVariable Long typeOp, @PathVariable String vehicleType) {
+        List<Long> values = repairService.getRepairCountAndValue(vehicleType, typeOp);
+        return ResponseEntity.ok(values);
+    }
+
+    @PostMapping("/repNumbDisc/{baseCost}")
     public ResponseEntity<Long> getRepairNumberDiscount(@PathVariable Long baseCost, @RequestBody VehicleEntity vehicle) {
         Long value = repairService.repairNumberDiscount(vehicle, baseCost);
         return ResponseEntity.ok(value);
     }
 
-    @GetMapping("/bonusDisc/{consume}")
+    @PostMapping("/bonusDisc/{consume}")
     public ResponseEntity<Long> getBonusDiscount(@PathVariable boolean consume, @RequestBody VehicleEntity vehicle) {
         Long value = repairService.bonusDiscount(vehicle, consume);
         return ResponseEntity.ok(value);
     }
 
-    @GetMapping("/antiquityRech/{baseCost}")
+    @PostMapping("/antiquityRech/{baseCost}")
     public ResponseEntity<Long> getAntiquityRecharge(@PathVariable Long baseCost, @RequestBody VehicleEntity vehicle) {
         Long value = repairService.antiquityRecharge(vehicle, baseCost);
         return ResponseEntity.ok(value);
     }
 
-    @GetMapping("/mileageRech/{baseCost}")
+    @PostMapping("/mileageRech/{baseCost}")
     public ResponseEntity<Long> getMileageRecharge(@PathVariable Long baseCost, @RequestBody VehicleEntity vehicle) {
         Long value = repairService.mileageRecharge(vehicle, baseCost);
         return ResponseEntity.ok(value);

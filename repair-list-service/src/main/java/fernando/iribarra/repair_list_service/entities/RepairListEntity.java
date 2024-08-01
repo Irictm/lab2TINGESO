@@ -16,7 +16,8 @@ public class RepairListEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Long id;
-    private Integer type;
+    private Integer operationType;
     private String motorType;
     private Long price;
+    private String name;
 }

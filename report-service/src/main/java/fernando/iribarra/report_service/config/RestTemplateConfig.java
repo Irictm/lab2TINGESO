@@ -1,4 +1,4 @@
-package fernando.iribarra.repair_service.config;
+package fernando.iribarra.report_service.config;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
