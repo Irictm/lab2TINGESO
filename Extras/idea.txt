@@ -1,0 +1,12 @@
+reporte1:
+  VehicleService {getVehiclesWithCarType(String carType)} 
+    -> repairService{getRepairCountAndValue(List<Long> vehicle_ids, Long opType)}
+      -> reportService{save(Report1Entity report1)}
+        -> reportService{getReportForAllCarTypes(Long opType)} (vehicleService.getAllCarTypes() returns List<String>)
+           -> FRONTEND (call for every opType -> repairListService{getRepairTypeCount()})
+
+reporte2:
+  repairService{getRepairCountAndValueOfMonth(int year, int month, Long opType)}
+     -> reportService{save(Report2Entity report2)}
+        -> reportService{getReportInfoLastTwoMonths(int year, int month, Long opType)}
+           -> FRONTEND (call for every opType -> repairListService{getRepairTypeCount()})

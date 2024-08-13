@@ -14,8 +14,8 @@ public interface RepairRepository extends JpaRepository<RepairEntity, Long> {
     @Query(value = "SELECT * FROM repairs WHERE id_vehicle = :id_vehicle", nativeQuery = true)
     public List<RepairEntity> findVehicleRepairs(@Param("id_vehicle") Long id_vehicle);
 
-    @Query(value = "SELECT r.* FROM repairs r, operations o WHERE r.id = o.id_repair AND o.type = :typeOp AND r.id_vehicle = :id_vehicle", nativeQuery = true)
-    public List<RepairEntity> findVehicleRepairsWithOpType(@Param("id_vehicle") Long id_vehicle, @Param("typeOp") Long typeOp);
+    @Query(value = "SELECT r.* FROM repairs r, operations o WHERE r.id = o.id_repair AND o.type = :typeOp AND r.id_vehicle = :id_vehicle AND EXTRACT('YEAR' FROM r.date_of_admission) = :year AND EXTRACT('MONTH' FROM r.date_of_admission) = :month", nativeQuery = true)
+    public List<RepairEntity> findVehicleRepairsWithOpType(@Param("id_vehicle") Long id_vehicle, @Param("typeOp") Long typeOp, @Param("year") int year, @Param("month") int month);
 
     @Query(value = "SELECT * FROM repairs WHERE id_vehicle = :id_vehicle", nativeQuery = true)
     public List<RepairEntity> findAllByVehicleId(@Param("id_vehicle") Long id_vehicle);

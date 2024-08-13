@@ -44,17 +44,34 @@ public class RepairService {
 
     public List<RepairEntity> getAllRepairs() { return repairRepository.findAll(); }
 
-    public List<Long> getRepairCountAndValue(String vehicleType, Long opType) {
+    public List<Long> getRepairCountAndValue(String vehicleType, Long opType, int year, int month) {
         ParameterizedTypeReference<List<VehicleEntity>> responseType = new ParameterizedTypeReference<List<VehicleEntity>>() {};
         List<VehicleEntity> vehicles = restTemplate.exchange("http://vehicle-service/api/v1/vehicle/type/" + vehicleType, HttpMethod.GET, null, responseType).getBody();
-        OperationEntity opTemp = new OperationEntity(1L, "", opType.intValue(), LocalDateTime.now(), 1L, 1L);
         List<Long> values = new ArrayList<>();
         List<RepairEntity> repairs = new ArrayList<>();
         Long cost = 0L;
         for(VehicleEntity vehicle: vehicles){
-            List<RepairEntity> foundRepairs =  repairRepository.findVehicleRepairsWithOpType(vehicle.getId(), opType);
-            if(foundRepairs != null) {
-                cost += operationService.calculateBaseCost(opTemp, vehicle.getMotorType());
+            List<RepairEntity> foundRepairs =  repairRepository.findVehicleRepairsWithOpType(vehicle.getId(), opType, year, month);
+            if(!foundRepairs.isEmpty()) {
+                cost += restTemplate.getForObject("http://repair-list-service/api/v1/repairList/" + opType + "/" + vehicle.getMotorType(), Long.class);
+                repairs.addAll(foundRepairs);
+            }
+        }
+        values.add((long) repairs.size());
+        values.add(cost);
+        return values;
+    }
+
+    public List<Long> getRepairCountAndValue(Long opType, int year, int month) {
+        ParameterizedTypeReference<List<VehicleEntity>> responseType = new ParameterizedTypeReference<List<VehicleEntity>>() {};
+        List<VehicleEntity> vehicles = restTemplate.exchange("http://vehicle-service/api/v1/vehicle/", HttpMethod.GET, null, responseType).getBody();
+        List<Long> values = new ArrayList<>();
+        List<RepairEntity> repairs = new ArrayList<>();
+        Long cost = 0L;
+        for(VehicleEntity vehicle: vehicles){
+            List<RepairEntity> foundRepairs =  repairRepository.findVehicleRepairsWithOpType(vehicle.getId(), opType, year, month);
+            if(!foundRepairs.isEmpty()) {
+                cost += restTemplate.getForObject("http://repair-list-service/api/v1/repairList/" + opType + "/" + vehicle.getMotorType(), Long.class);
                 repairs.addAll(foundRepairs);
             }
         }
@@ -124,6 +141,7 @@ public class RepairService {
             System.out.print("ERROR, Vehiculo asociado a reparacion no existe. \n");
             return repair;
         }
+        if (repair.getTotalAmount() == null) { repair.setTotalAmount(0L); }
 
         long baseCost = operationService.calculateTotalRepairBaseCost(repair.getId(), vehicle.getMotorType());
         long rechargeCost = mileageRecharge(vehicle, baseCost) + antiquityRecharge(vehicle, baseCost) + delayRecharge(repair, baseCost);

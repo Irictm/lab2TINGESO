@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "report2")
 @Data
@@ -16,7 +18,7 @@ public class Report2Entity {
     @Column(unique = true, nullable = false)
     private Long id;
     private Long operationType;
-    private String month;
     private Long count;
     private Long amount;
+    private LocalDate dateOfReport;
 }

@@ -26,9 +26,9 @@ public class Report1Controller {
         return ResponseEntity.ok(report1es);
     }
 
-    @GetMapping("/reportforallcartypes/{optype}")
-    public ResponseEntity<List<Long>> getFinalReport1ForAllCarTypes(@PathVariable Long optype) {
-        List<Long> finalReport1 = report1Service.getFinalReportForAllCarTypes(optype);
+    @GetMapping("/reportforallcartypes/{optype}/{year}/{month}")
+    public ResponseEntity<List<Long>> getFinalReport1ForAllCarTypes(@PathVariable Long optype, @PathVariable int year, @PathVariable int month) {
+        List<Long> finalReport1 = report1Service.getFinalReportForAllCarTypes(optype, year, month);
         return ResponseEntity.ok(finalReport1);
     }
 

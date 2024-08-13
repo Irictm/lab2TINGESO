@@ -46,9 +46,15 @@ public class RepairController {
         return ResponseEntity.ok(values);
     }
 
-    @GetMapping("/repairCountAndValue/{vehicleType}/{typeOp}")
-    public ResponseEntity<List<Long>> getRepairCountAndValue(@PathVariable Long typeOp, @PathVariable String vehicleType) {
-        List<Long> values = repairService.getRepairCountAndValue(vehicleType, typeOp);
+    @GetMapping("/repairCountAndValue/{vehicleType}/{typeOp}/{year}/{month}")
+    public ResponseEntity<List<Long>> getRepairCountAndValue(@PathVariable String vehicleType, @PathVariable Long typeOp, @PathVariable int year, @PathVariable int month) {
+        List<Long> values = repairService.getRepairCountAndValue(vehicleType, typeOp, year, month);
+        return ResponseEntity.ok(values);
+    }
+
+    @GetMapping("/repairCountAndValue/{typeOp}/{year}/{month}")
+    public ResponseEntity<List<Long>> getRepairCountAndValue(@PathVariable Long typeOp, @PathVariable int year, @PathVariable int month) {
+        List<Long> values = repairService.getRepairCountAndValue(typeOp, year, month);
         return ResponseEntity.ok(values);
     }
 

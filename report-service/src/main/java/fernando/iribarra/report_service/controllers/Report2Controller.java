@@ -20,6 +20,12 @@ public class Report2Controller {
         return ResponseEntity.ok(report2);
     }
 
+    @GetMapping("/reportlasttwomonths/{optype}/{year}/{month}")
+    public ResponseEntity<List<Long>> getFinalReport2ForLastTwoMonths(@PathVariable Long optype, @PathVariable int year, @PathVariable int month) {
+        List<Long> finalReport2 = report2Service.getReportInfoLastTwoMonths(optype, year, month);
+        return ResponseEntity.ok(finalReport2);
+    }
+
     @GetMapping("/")
     public ResponseEntity<List<Report2Entity>> getAllReport2() {
         List<Report2Entity> report2es = report2Service.getAllReport2();

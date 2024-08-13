@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface Report1Repository extends JpaRepository<Report1Entity, Long> {
 
-    @Query(value = "SELECT * FROM report1 WHERE operation_type = :operationType AND vehicle_type = :vehicleType AND EXTRACT('MONTH' FROM date_of_report) = :month", nativeQuery = true)
-    public Report1Entity existsByTypeAndMonth(@Param("operationType") Long operationType, @Param("vehicleType") String vehicleType, @Param("month") int month);
+    @Query(value = "SELECT * FROM report1 WHERE operation_type = :operationType AND vehicle_type = :vehicleType AND EXTRACT('YEAR' FROM date_of_report) = :year AND EXTRACT('MONTH' FROM date_of_report) = :month", nativeQuery = true)
+    public Report1Entity existsByTypeAndYearAndMonth(@Param("operationType") Long operationType, @Param("vehicleType") String vehicleType, @Param("year") int year, @Param("month") int month);
 
 }

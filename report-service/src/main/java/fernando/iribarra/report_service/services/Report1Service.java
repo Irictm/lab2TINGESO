@@ -27,26 +27,33 @@ public class Report1Service {
             return foundReport;
         }
         ParameterizedTypeReference<List<Long>> responseType = new ParameterizedTypeReference<List<Long>>() {};
-        List<Long> values = restTemplate.exchange("http://repair-service/api/v1/repair/repairCountAndValue/" + report1.getVehicleType() + "/" + report1.getOperationType(), HttpMethod.GET, null, responseType).getBody();
+        List<Long> values = restTemplate.exchange("http://repair-service/api/v1/repair/repairCountAndValue/" + report1.getVehicleType() + "/" + report1.getOperationType() + "/" + report1.getDateOfReport().getYear() + "/" + report1.getDateOfReport().getMonth().getValue(), HttpMethod.GET, null, responseType).getBody();
         report1.setCount(values.get(0));
         report1.setAmount(values.get(1));
         return report1Repository.save(report1);
     }
 
     public Report1Entity reportExists(Report1Entity report1) {
-        return report1Repository.existsByTypeAndMonth(report1.getOperationType(), report1.getVehicleType(), report1.getDateOfReport().getMonth().getValue());
+        return report1Repository.existsByTypeAndYearAndMonth(report1.getOperationType(), report1.getVehicleType(), report1.getDateOfReport().getYear(),report1.getDateOfReport().getMonth().getValue());
     }
 
-    public List<Long> getFinalReportForAllCarTypes(Long opType) {
+    public List<Long> getFinalReportForAllCarTypes(Long opType, int year, int month) {
         List<Long> values = new ArrayList<>();
+        Long countTotal = 0L;
+        Long amountTotal = 0L;
         ParameterizedTypeReference<List<String>> responseType = new ParameterizedTypeReference<List<String>>() {};
         List<String> carTypes = restTemplate.exchange("http://vehicle-service/api/v1/vehicle/vehicletypes", HttpMethod.GET, null, responseType).getBody();
         for (String carType: carTypes) {
-            Report1Entity report = new Report1Entity(null, opType, carType, 0L, 0L, LocalDate.now());
+            LocalDate date = LocalDate.of(year, month, 1);
+            Report1Entity report = new Report1Entity(null, opType, carType, 0L, 0L, date);
             report = saveReport1(report);
             values.add(report.getCount());
             values.add(report.getAmount());
+            countTotal += report.getCount();
+            amountTotal += report.getAmount();
         }
+        values.add(countTotal);
+        values.add(amountTotal);
         return values;
     }
 

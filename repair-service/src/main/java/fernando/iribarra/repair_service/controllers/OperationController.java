@@ -1,6 +1,8 @@
 package fernando.iribarra.repair_service.controllers;
 
 import fernando.iribarra.repair_service.entities.OperationEntity;
+import fernando.iribarra.repair_service.entities.RepairEntity;
+import fernando.iribarra.repair_service.models.VehicleEntity;
 import fernando.iribarra.repair_service.services.OperationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,12 @@ public class OperationController {
     public ResponseEntity<OperationEntity> getOperationById(@PathVariable Long id) {
         OperationEntity operation = operationService.getOperationById(id);
         return ResponseEntity.ok(operation);
+    }
+
+    @GetMapping("/getvehicle/{id}")
+    public ResponseEntity<VehicleEntity> getOperationsVehicle(@PathVariable Long id) {
+        VehicleEntity vehicle = operationService.getOperationsVehicle(id);
+        return ResponseEntity.ok(vehicle);
     }
 
     @PostMapping("/")

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/repairList")
@@ -25,10 +26,16 @@ public class RepairListController {
         return ResponseEntity.ok(repairLists);
     }
 
-    @GetMapping("/{type}/{motor}")
-    public ResponseEntity<Long> getBaseCost(@PathVariable int type, @PathVariable String motor) {
-        Long value = repairListService.getBaseCost(type, motor);
+    @GetMapping("/{opType}/{motor}")
+    public ResponseEntity<Long> getBaseCost(@PathVariable int opType, @PathVariable String motor) {
+        Long value = repairListService.getBaseCost(opType, motor);
         return ResponseEntity.ok(value);
+    }
+
+    @GetMapping("/alloptypes")
+    public ResponseEntity<List<Map<String, String>>> getAllOperationTypes() {
+        List<Map<String, String>> opTypes = repairListService.getAllOperationTypes();
+        return ResponseEntity.ok(opTypes);
     }
 
     @PostMapping("/")
