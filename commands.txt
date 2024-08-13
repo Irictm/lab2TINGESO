@@ -1,3 +1,9 @@
+- Minikube Basic commands -
+minikube start --driver=docker
+minikube stop
+minikube delete
+
+
 - Docker Build and Push -
 docker build -t irictm/lab2-tingeso-config-server:latest .
 docker push irictm/lab2-tingeso-config-server:latest
